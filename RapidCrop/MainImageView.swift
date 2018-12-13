@@ -56,7 +56,7 @@ class MainImageView: NSImageView {
         delegate?.setWindowSize(aspectRatio: getAspectRatio(image: image!),size: image!.size)
     
         self.image = image
-    
+        
         return true
     }
     

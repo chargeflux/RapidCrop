@@ -12,6 +12,7 @@
 		5B6960D121C1C956000E80C6 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 5B6960D021C1C956000E80C6 /* Assets.xcassets */; };
 		5B6960D421C1C956000E80C6 /* Main.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 5B6960D221C1C956000E80C6 /* Main.storyboard */; };
 		5B6960E021C1C957000E80C6 /* RapidCropTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B6960DF21C1C957000E80C6 /* RapidCropTests.swift */; };
+		5B7F59C521C303D200B238B6 /* CroppingView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B7F59C421C303D200B238B6 /* CroppingView.swift */; };
 		5B92A5E321C2066B00FCB0F6 /* MainImageView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 5B92A5E221C2066B00FCB0F6 /* MainImageView.swift */; };
 /* End PBXBuildFile section */
 
@@ -35,6 +36,7 @@
 		5B6960DB21C1C957000E80C6 /* RapidCropTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = RapidCropTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		5B6960DF21C1C957000E80C6 /* RapidCropTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RapidCropTests.swift; sourceTree = "<group>"; };
 		5B6960E121C1C957000E80C6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		5B7F59C421C303D200B238B6 /* CroppingView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CroppingView.swift; sourceTree = "<group>"; };
 		5B92A5E221C2066B00FCB0F6 /* MainImageView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainImageView.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
@@ -80,6 +82,7 @@
 				5B6960CC21C1C954000E80C6 /* AppDelegate.swift */,
 				5B6960CE21C1C954000E80C6 /* RapidCropViewController.swift */,
 				5B92A5E221C2066B00FCB0F6 /* MainImageView.swift */,
+				5B7F59C421C303D200B238B6 /* CroppingView.swift */,
 				5B6960D021C1C956000E80C6 /* Assets.xcassets */,
 				5B6960D221C1C956000E80C6 /* Main.storyboard */,
 				5B6960D521C1C956000E80C6 /* Info.plist */,
@@ -198,6 +201,7 @@
 			files = (
 				5B92A5E321C2066B00FCB0F6 /* MainImageView.swift in Sources */,
 				5B6960CF21C1C954000E80C6 /* RapidCropViewController.swift in Sources */,
+				5B7F59C521C303D200B238B6 /* CroppingView.swift in Sources */,
 				5B6960CD21C1C954000E80C6 /* AppDelegate.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
