@@ -8,34 +8,38 @@
 
 import Cocoa
 
+protocol MainImageViewDelegate {
+    func setWindowSize(aspectRatio: CGFloat, size: NSSize)
+}
+
 class MainImageView: NSImageView {
+    
+    var fileImageURL: URL?
+    
+    var delegate: MainImageViewDelegate?
+    
+    // Dragging an file (no distinction of image) from Finder has a PasteboardType of "public.file-url"
+    // Can be determined via draggingPasteboard.availableType(from: draggingPasteboard.types!)
+    let acceptedDraggingPasteboardTypes: [NSPasteboard.PasteboardType] = [NSPasteboard.PasteboardType.fileURL]
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-
-        // Drawing code here.
+        
     }
-    
-    let acceptedDraggingPasteboardTypes: [NSPasteboard.PasteboardType] = [NSPasteboard.PasteboardType.fileURL]
-    
-    let acceptedDraggingFileTypes: [String] = ["jpg","jpeg","tiff","png"]
-    // TODO: Implement file extension check
     
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-        
+
         registerForDraggedTypes(acceptedDraggingPasteboardTypes)
-        
+
     }
     
     override func draggingEntered(_ sender: NSDraggingInfo) -> NSDragOperation {
         let draggingPasteboard: NSPasteboard = sender.draggingPasteboard
         
         let sourceDragMask: NSDragOperation = sender.draggingSourceOperationMask
-        
-        
-        if !(Set(draggingPasteboard.types!).intersection(Set(acceptedDraggingPasteboardTypes)).isEmpty) {
 
+        if acceptedDraggingPasteboardTypes.contains(draggingPasteboard.availableType(from: draggingPasteboard.types!)!) && NSImage.canInit(with: draggingPasteboard){
             if sourceDragMask == NSDragOperation.generic {
                 return NSDragOperation.generic;
             }
@@ -45,9 +49,18 @@ class MainImageView: NSImageView {
     }
     
     override func performDragOperation(_ sender: NSDraggingInfo) -> Bool {
-        let dragImageURL: String = sender.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType.fileURL) as! String
-        self.image = NSImage(byReferencing: URL(string: dragImageURL)!)
+        fileImageURL = URL(string: (sender.draggingPasteboard.propertyList(forType: NSPasteboard.PasteboardType.fileURL) as! String))
+    
+        let image = NSImage.init(pasteboard: sender.draggingPasteboard)
+    
+        delegate?.setWindowSize(aspectRatio: getAspectRatio(image: image!),size: image!.size)
+    
+        self.image = image
+    
         return true
     }
     
+    func getAspectRatio(image: NSImage) -> CGFloat {
+        return image.size.width/image.size.height
+    }
 }
