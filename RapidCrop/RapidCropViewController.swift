@@ -16,23 +16,20 @@ class RapidCropViewController: NSViewController {
     
     @IBOutlet var mainImageView: MainImageView!
 
-    var croppingView: CroppingView?
+    var croppingView: CroppingView!
     
     var croppingViewExists: Bool = false
+    
+    var croppedImages: [NSImage] = []
 
     @IBAction func mainImageViewSet(_ sender: Any) {
         if croppingViewExists {
             croppingView!.removeFromSuperview()
             croppingViewExists = false
         }
-    }
-    
-    override func mouseDown(with event: NSEvent) {
-        if !croppingViewExists {
-            croppingView = CroppingView.init(frame: mainImageView.bounds)
-            self.view.addSubview(croppingView!)
-            croppingViewExists = true
-        }
+        croppingView = CroppingView.init(frame: mainImageView.bounds)
+        self.view.addSubview(croppingView!)
+        croppingViewExists = true
     }
     
     override func viewDidLoad() {
@@ -43,6 +40,11 @@ class RapidCropViewController: NSViewController {
     override func viewDidAppear() {
         defaultWindowFrame = self.view.window?.frame
         defaultImageViewBounds = mainImageView.bounds
+    }
+    
+    override func mouseUp(with event: NSEvent) {
+        croppingView.endingPoint = event.locationInWindow
+        croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: croppingView.startingPoint.x, y: croppingView.startingPoint.y, width: croppingView.endingPoint.x - croppingView.startingPoint.x, height: croppingView.endingPoint.y - croppingView.startingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
     }
 }
 

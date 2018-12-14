@@ -24,7 +24,6 @@ class MainImageView: NSImageView {
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        
     }
     
     required init?(coder: NSCoder) {

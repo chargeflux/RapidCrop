@@ -9,10 +9,17 @@
 import Cocoa
 
 class CroppingView: NSView {
+    
+    var startingPoint: CGPoint!
+    
+    var endingPoint: CGPoint!
+    
+    var cropShapeLayer: CAShapeLayer!
+    
+    var cropOverlayLayer: CALayer!
 
     override func draw(_ dirtyRect: NSRect) {
         super.draw(dirtyRect)
-        self.layer?.backgroundColor = NSColor.black.withAlphaComponent(0.6).cgColor
     }
     
     override init(frame frameRect: NSRect) {
@@ -52,4 +59,40 @@ class CroppingView: NSView {
         return croppedImage
     }
     
+    override func mouseDown(with event: NSEvent) {
+        startingPoint = event.locationInWindow
+        
+        if cropOverlayLayer == nil {
+            cropOverlayLayer = CALayer()
+            cropOverlayLayer.opacity = 0.6
+            cropOverlayLayer.backgroundColor = NSColor.black.cgColor
+            cropOverlayLayer.frame = self.frame
+            self.layer?.addSublayer(cropOverlayLayer)
+        }
+        
+        cropShapeLayer = CAShapeLayer()
+
+        cropShapeLayer.lineWidth = 2.0
+        cropShapeLayer.fillColor = nil
+        
+        cropShapeLayer.strokeColor = NSColor.black.cgColor
+        
+        self.layer?.addSublayer(cropShapeLayer)
+    }
+    
+    override func mouseDragged(with event: NSEvent) {
+
+        let endPoint: NSPoint = event.locationInWindow
+
+        let path = CGMutablePath()
+        
+        path.move(to: self.startingPoint)
+        path.addLine(to: NSPoint(x: self.startingPoint.x, y: endPoint.y))
+        path.addLine(to: endPoint)
+        path.addLine(to: NSPoint(x:endPoint.x,y:self.startingPoint.y))
+        
+        path.closeSubpath()
+        
+        cropShapeLayer.path = path
+    }
 }
