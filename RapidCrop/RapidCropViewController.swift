@@ -87,31 +87,62 @@ class RapidCropViewController: NSViewController {
             return nil
         /// Check if "S" key is pressed: Save cropped regions as individual files
         case kVK_ANSI_S:
+            if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] {
             if !event.isARepeat && croppedImages != [] {
-                saveImage()
-                croppedImages.removeAll()
-                if croppingViewExists {
-                    croppingView.removeFromSuperview()
-                    croppingViewExists = false
+                    saveImage()
+                    croppedImages.removeAll()
+                    if croppingViewExists {
+                        croppingView.removeFromSuperview()
+                        croppingViewExists = false
+                    }
+                    mainImageView.image = nil
                 }
-                mainImageView.image = nil
-            }
             return nil
+            }
+            return event
         default:
             return event
-        }
+            }
     }
     
     override func mouseUp(with event: NSEvent) {
         if croppingView != nil {
-        croppingView.endingPoint = event.locationInWindow
-        let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
-        
-        let mainImageStartingPoint = croppingView.startingPoint!
-        let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
-        let mainImageEndingPoint =  croppingView.endingPoint!
-        
-        croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+            if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] && !croppingView.isDragging {
+                if croppingView.startingPointFor2PointRectangle == nil {
+                    croppingView.startingPointFor2PointRectangle = event.locationInWindow
+                    croppingView.isCreatingTwoPointRectangle = true
+                    return
+                }
+                else {
+                    croppingView.createCropRegion(endPoint: event.locationInWindow, twoPoint: true)
+
+                    let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
+                    
+                    let mainImageStartingPoint = croppingView.startingPointFor2PointRectangle!
+                    let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
+                    let mainImageEndingPoint =  event.locationInWindow
+                    
+                    croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+                    
+                    croppingView.startingPointFor2PointRectangle = nil
+                    croppingView.isCreatingTwoPointRectangle = false
+                    return
+                }
+            }
+            croppingView.isCreatingTwoPointRectangle = false
+            croppingView.startingPointFor2PointRectangle = nil
+            
+            if croppingView.isDragging {
+                croppingView.endingPoint = event.locationInWindow
+                let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
+                
+                let mainImageStartingPoint = croppingView.startingPoint!
+                let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
+                let mainImageEndingPoint =  croppingView.endingPoint!
+                
+                croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+                croppingView.isDragging = false
+            }
         }
     }
     

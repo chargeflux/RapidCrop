@@ -14,6 +14,10 @@ class CroppingView: NSView {
     
     var endingPoint: CGPoint!
     
+    var isCreatingTwoPointRectangle: Bool!
+    
+    var isDragging: Bool! = false
+    
     var cropShapeLayer: CAShapeLayer!
 
     override func draw(_ dirtyRect: NSRect) {
@@ -56,7 +60,10 @@ class CroppingView: NSView {
         return croppedImage
     }
     
+    var startingPointFor2PointRectangle: NSPoint!
+
     override func mouseDown(with event: NSEvent) {
+        
         startingPoint = event.locationInWindow
         
         cropShapeLayer = CAShapeLayer()
@@ -70,15 +77,32 @@ class CroppingView: NSView {
     }
     
     override func mouseDragged(with event: NSEvent) {
-
         let endPoint: NSPoint = event.locationInWindow
+        
+        isDragging = true
+        startingPointFor2PointRectangle = nil
+        isCreatingTwoPointRectangle = false
 
+        createCropRegion(endPoint: endPoint)
+    }
+    
+    func createCropRegion(endPoint: NSPoint, twoPoint: Bool! = false) {
         let path = CGMutablePath()
         
-        path.move(to: self.startingPoint)
-        path.addLine(to: NSPoint(x: self.startingPoint.x, y: endPoint.y))
-        path.addLine(to: endPoint)
-        path.addLine(to: NSPoint(x:endPoint.x,y:self.startingPoint.y))
+        if !twoPoint {
+            path.move(to: self.startingPoint)
+            path.addLine(to: NSPoint(x: self.startingPoint.x, y: endPoint.y))
+            path.addLine(to: endPoint)
+            path.addLine(to: NSPoint(x:endPoint.x,y:self.startingPoint.y))
+        }
+        else {
+            path.move(to: self.startingPointFor2PointRectangle)
+            path.addLine(to: NSPoint(x: self.startingPointFor2PointRectangle.x, y: endPoint.y))
+            path.addLine(to: endPoint)
+            path.addLine(to: NSPoint(x:endPoint.x,y:self.startingPointFor2PointRectangle.y))
+            
+        }
+        
         
         path.closeSubpath()
         
