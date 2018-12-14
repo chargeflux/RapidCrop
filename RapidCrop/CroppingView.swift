@@ -36,28 +36,28 @@ class CroppingView: NSView {
     ///     - displayHeight: the height of the image as displayed
     func cropImage(_ inputImage: NSImage, cropRect: CGRect, displayWidth: CGFloat, displayHeight: CGFloat) -> NSImage? {
     // Cropping function courtesy of Apple: https://developer.apple.com/documentation/coregraphics/cgimage/1454683-cropping
-//        let imageViewScale = max(inputImage.size.width / displayWidth,
-//                                 inputImage.size.height / displayHeight)
-//        
+        let imageViewScale = max(inputImage.size.width / displayWidth,
+                                 inputImage.size.height / displayHeight)
+        
         // Scale cropRect to handle images larger than shown-on-screen size (Apple)
-        //let scaledCropRect = CGRect(x:cropRect.origin.x * imageViewScale,
-//                              y:cropRect.origin.y / imageViewScale,
-//                              width:cropRect.size.width / imageViewScale,
-//                              height:cropRect.size.height / imageViewScale)
+        let scaledCropRect = CGRect(x:cropRect.origin.x * imageViewScale,
+                              y:cropRect.origin.y * imageViewScale,
+                              width:cropRect.size.width * imageViewScale,
+                              height:cropRect.size.height * imageViewScale)
         
         // Perform cropping in Core Graphics (Apple)
-        guard let croppedImageRef: CGImage = inputImage.cgImage(forProposedRect: nil, context: nil, hints: nil)?.cropping(to: cropRect)
+        guard let croppedImageRef: CGImage = inputImage.cgImage(forProposedRect: nil, context: nil, hints: nil)?.cropping(to: scaledCropRect)
             else {
                 return nil
         }
         
         // Return image to NSImage (Apple)
-        let croppedImage: NSImage = NSImage(cgImage: croppedImageRef, size: cropRect.size)
+        let croppedImage: NSImage = NSImage(cgImage: croppedImageRef, size: NSZeroSize)
         return croppedImage
     }
     
     override func mouseDown(with event: NSEvent) {
-        startingPoint = self.convert(event.locationInWindow, from: self)
+        startingPoint = event.locationInWindow
         
         cropShapeLayer = CAShapeLayer()
 
@@ -71,7 +71,7 @@ class CroppingView: NSView {
     
     override func mouseDragged(with event: NSEvent) {
 
-        let endPoint: NSPoint = self.convert(event.locationInWindow, from: self)
+        let endPoint: NSPoint = event.locationInWindow
 
         let path = CGMutablePath()
         

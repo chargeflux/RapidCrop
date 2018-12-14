@@ -55,13 +55,14 @@ class RapidCropViewController: NSViewController {
     }
     
     override func mouseUp(with event: NSEvent) {
-        croppingView.endingPoint = self.view.convert(event.locationInWindow,from: croppingView)
-        let mainImageViewHeight: CGFloat = mainImageView.image!.size.height
-        var mainImageStartingPoint = croppingView.startingPoint * imageScaling
-        mainImageStartingPoint.y = mainImageViewHeight - mainImageStartingPoint.y
-        var mainImageEndingPoint =  croppingView.endingPoint * imageScaling
-        mainImageEndingPoint.y = mainImageViewHeight - mainImageEndingPoint.y
-        croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPoint.y, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageEndingPoint.y - mainImageStartingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+        croppingView.endingPoint = event.locationInWindow
+        let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
+        
+        let mainImageStartingPoint = croppingView.startingPoint!
+        let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
+        let mainImageEndingPoint =  croppingView.endingPoint!
+        
+        croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
     }
     
     func saveImage() {
