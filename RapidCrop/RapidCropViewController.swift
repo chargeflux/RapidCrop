@@ -7,6 +7,7 @@
 //
 
 import Cocoa
+import Carbon.HIToolbox
 
 class RapidCropViewController: NSViewController {
     
@@ -27,6 +28,8 @@ class RapidCropViewController: NSViewController {
     var croppedImages: [NSImage] = []
     
     var fileImageURL: URL!
+    
+    var keyboardShortcutMonitor: Any?
 
     @IBAction func mainImageViewSet(_ sender: Any) {
         imageScaling = mainImageView.image!.size.width/mainImageView.bounds.size.width
@@ -38,15 +41,23 @@ class RapidCropViewController: NSViewController {
             croppingView!.removeFromSuperview()
             croppingViewExists = false
         }
+        initializeCroppingView()
+        self.fileImageURL = mainImageView.fileImageURL
+    }
+    
+    func initializeCroppingView() {
         croppingView = CroppingView.init(frame: mainImageView.bounds)
         self.view.addSubview(croppingView!)
         croppingViewExists = true
-        self.fileImageURL = mainImageView.fileImageURL
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         mainImageView.delegate = self
+        
+        // Start monitor for keyboard shortcuts via keyDown NSEvents
+        startKeyboardShortcutMonitor()
     }
     
     override func viewDidAppear() {
@@ -54,7 +65,45 @@ class RapidCropViewController: NSViewController {
         defaultImageViewBounds = mainImageView.bounds
     }
     
+    func startKeyboardShortcutMonitor() {
+        /// Initializes monitor for keyboard shortcuts, i.e., when user presses a key
+        self.keyboardShortcutMonitor = NSEvent.addLocalMonitorForEvents(matching: .keyDown, handler: keyboardShortcut)
+    }
+    
+    func keyboardShortcut(_ event: NSEvent) -> NSEvent? {
+        // If particular shortcut is pressed, certain functions are executed and returns the
+        // the event as `nil` to prevent triggering the "Basso"/default alert sound because the
+        // system won't recognize the key press as a valid input/shortcut. Otherwise the event
+        // is returned as is to the system input manager to be processed.
+        switch Int(event.keyCode) {
+        /// Check if Escape key is pressed: remove last selection
+        case kVK_Escape:
+            if !event.isARepeat {
+                if croppedImages != [] {
+                    croppedImages.removeLast()
+                    croppingView.layer?.sublayers!.removeLast()
+                }
+            }
+            return nil
+        /// Check if "S" key is pressed: Save cropped regions as individual files
+        case kVK_ANSI_S:
+            if !event.isARepeat && croppedImages != [] {
+                saveImage()
+                croppedImages.removeAll()
+                if croppingViewExists {
+                    croppingView.removeFromSuperview()
+                    croppingViewExists = false
+                }
+                mainImageView.image = nil
+            }
+            return nil
+        default:
+            return event
+        }
+    }
+    
     override func mouseUp(with event: NSEvent) {
+        if croppingView != nil {
         croppingView.endingPoint = event.locationInWindow
         let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
         
@@ -63,6 +112,7 @@ class RapidCropViewController: NSViewController {
         let mainImageEndingPoint =  croppingView.endingPoint!
         
         croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+        }
     }
     
     func saveImage() {
