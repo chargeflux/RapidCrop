@@ -14,7 +14,10 @@ class CroppingView: NSView {
     
     var endingPoint: CGPoint!
     
+    // if user is using two mouse clicks to create cropping region (not dragging)
     var isCreatingTwoPointRectangle: Bool!
+    
+    var startingPointFor2PointRectangle: NSPoint!
     
     var isDragging: Bool! = false
     
@@ -59,8 +62,6 @@ class CroppingView: NSView {
         let croppedImage: NSImage = NSImage(cgImage: croppedImageRef, size: NSZeroSize)
         return croppedImage
     }
-    
-    var startingPointFor2PointRectangle: NSPoint!
 
     override func mouseDown(with event: NSEvent) {
         
@@ -86,9 +87,14 @@ class CroppingView: NSView {
         createCropRegion(endPoint: endPoint)
     }
     
+    /// Create cropping rectangle via dragging or two point clicks
+    /// - Paramaters:
+    ///     - endPoint: the end point of the cropping rectangle
+    ///     - twoPoint: Distingush if it is dragging or two point clicks
     func createCropRegion(endPoint: NSPoint, twoPoint: Bool! = false) {
         let path = CGMutablePath()
         
+        // if it is a cropping operation via dragging
         if !twoPoint {
             path.move(to: self.startingPoint)
             path.addLine(to: NSPoint(x: self.startingPoint.x, y: endPoint.y))
@@ -102,8 +108,7 @@ class CroppingView: NSView {
             path.addLine(to: NSPoint(x:endPoint.x,y:self.startingPointFor2PointRectangle.y))
             
         }
-        
-        
+
         path.closeSubpath()
         
         cropShapeLayer.path = path

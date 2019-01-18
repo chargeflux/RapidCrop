@@ -32,10 +32,16 @@ class RapidCropViewController: NSViewController {
     var keyboardShortcutMonitor: Any?
 
     @IBAction func mainImageViewSet(_ sender: Any) {
+        /// Set the new image that was dropped and reinitialize CroppingView
+        
         imageScaling = mainImageView.image!.size.width/mainImageView.bounds.size.width
+        
+        // Save cropping regions for previous image when setting a new image
         if croppedImages != [] {
             saveImage()
         }
+        
+        // Reset CroppingView for new image
         croppedImages.removeAll()
         if croppingViewExists {
             croppingView!.removeFromSuperview()
@@ -61,6 +67,7 @@ class RapidCropViewController: NSViewController {
     }
     
     override func viewDidAppear() {
+        // Necessary for resizing frame according to dimensions of input image
         defaultWindowFrame = self.view.window?.frame
         defaultImageViewBounds = mainImageView.bounds
     }
@@ -85,7 +92,7 @@ class RapidCropViewController: NSViewController {
                 }
             }
             return nil
-        /// Check if "S" key is pressed: Save cropped regions as individual files
+        /// Check if "CMD" + "S" key is pressed: Save cropped regions as individual files
         case kVK_ANSI_S:
             if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] {
             if !event.isARepeat && croppedImages != [] {
@@ -102,11 +109,15 @@ class RapidCropViewController: NSViewController {
             return event
         default:
             return event
-            }
+        }
     }
     
     override func mouseUp(with event: NSEvent) {
+        /// if mouse button is released, handle non-cropping mouseDown/mouseUp events. Enables CMD+Clicking to draw cropping rectangle
+        /// without dragging
+        
         if croppingView != nil {
+            /// Press 'CMD' and click on image on 2 points to draw cropping region if user has not been dragging
             if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] && !croppingView.isDragging {
                 if croppingView.startingPointFor2PointRectangle == nil {
                     croppingView.startingPointFor2PointRectangle = event.locationInWindow
@@ -129,9 +140,12 @@ class RapidCropViewController: NSViewController {
                     return
                 }
             }
+            
+            // handles non-cropping mouseDown actions or if "CMD" is not used and resets cropping logic
             croppingView.isCreatingTwoPointRectangle = false
             croppingView.startingPointFor2PointRectangle = nil
             
+            // if cropping via dragging was initiated before, get mouseUp location and create image
             if croppingView.isDragging {
                 croppingView.endingPoint = event.locationInWindow
                 let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
@@ -147,6 +161,7 @@ class RapidCropViewController: NSViewController {
     }
     
     func saveImage() {
+        /// Saves cropped images to to ~/Downloads/Output with individual directories for each input image
         let fileManager = FileManager()
         let downloadDirectory = try! fileManager.url(for: .downloadsDirectory, in: .allDomainsMask, appropriateFor: nil, create: true)
         let savePath = downloadDirectory.appendingPathComponent("Output", isDirectory: true)
@@ -175,6 +190,7 @@ extension CGSize {
 }
 
 extension CGPoint {
+    /// Allows for scaling
     static func *(lhs: CGPoint, rhs: CGFloat) -> CGPoint {
         if rhs > 1 {
             return CGPoint(x:lhs.x * rhs, y:lhs.y * rhs)
@@ -189,7 +205,7 @@ extension CGPoint {
 extension RapidCropViewController: MainImageViewDelegate {
     
     func setWindowSize(aspectRatio: CGFloat,size: NSSize) {
-        titlebarOffset = defaultWindowFrame.size.height-defaultImageViewBounds.size.height
+        titlebarOffset = defaultWindowFrame.size.height - defaultImageViewBounds.size.height
         if aspectRatio != (defaultWindowFrame.size.width/(defaultWindowFrame.size.height-titlebarOffset)) {
             if size > defaultWindowFrame.size {
                 self.view.window?.setFrame(NSRect(x: defaultWindowFrame.minX, y: defaultWindowFrame.minY, width:defaultWindowFrame.size.width, height: (defaultWindowFrame.width/aspectRatio)+titlebarOffset), display: true)
