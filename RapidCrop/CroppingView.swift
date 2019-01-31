@@ -15,7 +15,7 @@ class CroppingView: NSView {
     var endingPoint: CGPoint!
     
     // if user is using two mouse clicks to create cropping region (not dragging)
-    var isCreatingTwoPointRectangle: Bool!
+    var isCreatingTwoPointRectangle: Bool! = false
     
     var startingPointFor2PointRectangle: NSPoint!
     

@@ -137,13 +137,11 @@ class RapidCropViewController: NSViewController {
                     
                     croppingView.startingPointFor2PointRectangle = nil
                     croppingView.isCreatingTwoPointRectangle = false
+                    let layerCount = croppingView.layer?.sublayers!.count
+                    croppingView.layer?.sublayers!.removeSubrange(layerCount!-2..<layerCount!-1) // remove cropShapeLayer created from first CMD click and keep second cropShapeLayer
                     return
                 }
             }
-            
-            // handles non-cropping mouseDown actions or if "CMD" is not used and resets cropping logic
-            croppingView.isCreatingTwoPointRectangle = false
-            croppingView.startingPointFor2PointRectangle = nil
             
             // if cropping via dragging was initiated before, get mouseUp location and create image
             if croppingView.isDragging {
@@ -157,9 +155,19 @@ class RapidCropViewController: NSViewController {
                 croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
                 croppingView.isDragging = false
             }
-            // remove croppingView sublayer created by mouseDown func for non-CMD point clicks
             else {
-                croppingView.layer?.sublayers!.removeLast()
+                // handles non-cropping mouseDown actions or if "CMD" is not used and resets cropping logic
+                if croppingView.isCreatingTwoPointRectangle { // fails to use CMD for second click
+                    croppingView.isCreatingTwoPointRectangle = false
+                    croppingView.startingPointFor2PointRectangle = nil
+                    let layerCount = croppingView.layer?.sublayers!.count
+                    let difference = abs(layerCount!-croppedImages.count)
+                    croppingView.layer?.sublayers!.removeSubrange(layerCount!-difference..<layerCount!)
+                }
+                else {
+                    // regular non-CMD clicks and not from dragging
+                    croppingView.layer?.sublayers!.removeLast()
+                }
             }
         }
     }
