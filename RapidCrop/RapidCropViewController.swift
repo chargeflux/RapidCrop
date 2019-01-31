@@ -157,6 +157,10 @@ class RapidCropViewController: NSViewController {
                 croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
                 croppingView.isDragging = false
             }
+            // remove croppingView sublayer created by mouseDown func for non-CMD point clicks
+            else {
+                croppingView.layer?.sublayers!.removeLast()
+            }
         }
     }
     
@@ -208,7 +212,13 @@ extension RapidCropViewController: MainImageViewDelegate {
         titlebarOffset = defaultWindowFrame.size.height - defaultImageViewBounds.size.height
         if aspectRatio != (defaultWindowFrame.size.width/(defaultWindowFrame.size.height-titlebarOffset)) {
             if size > defaultWindowFrame.size {
-                self.view.window?.setFrame(NSRect(x: defaultWindowFrame.minX, y: defaultWindowFrame.minY, width:defaultWindowFrame.size.width, height: (defaultWindowFrame.width/aspectRatio)+titlebarOffset), display: true)
+                if aspectRatio > 1 {
+                    self.view.window?.setFrame(NSRect(x: defaultWindowFrame.minX, y: defaultWindowFrame.minY, width:defaultWindowFrame.size.width, height: (defaultWindowFrame.width/aspectRatio)+titlebarOffset), display: true)
+                }
+                else {
+                    self.view.window?.setFrame(NSRect(x: defaultWindowFrame.minX, y: defaultWindowFrame.minY, width:defaultWindowFrame.size.height*aspectRatio, height: defaultWindowFrame.height+titlebarOffset), display: true)
+                }
+                
             }
             else {
                 self.view.window?.setFrame(NSRect(x: defaultWindowFrame.minX, y: defaultWindowFrame.minY, width: size.width, height: size.height+titlebarOffset), display: true)

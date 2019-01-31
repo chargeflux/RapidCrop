@@ -12,7 +12,7 @@
 1) Drag an image (.jpg, .png, .pdf, etc.) to the window
 2) Click and drag to draw cropping rectangles, outlined in black. Each cropping region is independent of each other and can overlap
 3) Press `CMD` and click on the image at 2 points to draw a cropping rectangle without having to drag
-4) Press `CMD` + `S` to save all cropping rectangles to `~/Downloads/Output` where it will be saved in a directory with the image file's name. Rectangles are saved in the order of which they are created
+4) Press `CMD` + `S` to save all cropping rectangles to `~/Downloads/Output` where it will be saved in a directory with the image file's name. Regions are saved in the order of which they are created
 5) Press `Esc` to remove the last cropping rectangle created  
 
 ## TODO
