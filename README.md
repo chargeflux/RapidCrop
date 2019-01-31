@@ -2,7 +2,9 @@
 
 **RapidCrop** is a Swift app that allows the user to rapidly crop an image by dragging or clicking twice for a starting and ending point for each new rectangle. Multiple cropping regions can be created on a single image and saved.
 
-![rapidcropexample](https://user-images.githubusercontent.com/20979457/52025411-32787d00-24d2-11e9-8134-e0e03b765978.png) ![finderoutputexample](https://user-images.githubusercontent.com/20979457/52025412-34424080-24d2-11e9-99f4-d83ca6e49736.png)
+RapidCrop                  |  Output
+:-------------------------:|:-------------------------:
+![rapidcropexample](https://user-images.githubusercontent.com/20979457/52025411-32787d00-24d2-11e9-8134-e0e03b765978.png)  |  ![finderoutputexample](https://user-images.githubusercontent.com/20979457/52025412-34424080-24d2-11e9-99f4-d83ca6e49736.png)
 
 ## Compilation
 
