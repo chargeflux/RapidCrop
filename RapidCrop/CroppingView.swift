@@ -35,7 +35,7 @@ class CroppingView: NSView {
         super.init(coder: coder)
     }
     
-    /// Crop NSImage to input CGRect `cropRect`
+    /// Crop NSImage to input CGRect `cropRect` (Origin is top left)
     /// - Parameters:
     ///     - inputImage: The input NSImage
     ///     - cropRect: The region to be cropped

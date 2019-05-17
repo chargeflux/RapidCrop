@@ -113,11 +113,11 @@ class RapidCropViewController: NSViewController {
     }
     
     override func mouseUp(with event: NSEvent) {
-        /// if mouse button is released, handle non-cropping mouseDown/mouseUp events. Enables CMD+Clicking to draw cropping rectangle
-        /// without dragging
-        
+        /// if mouse button is released, handle non-cropping mouseDown/mouseUp events.
+        /// Enables CMD+Clicking to draw cropping rectangle without dragging
         if croppingView != nil {
-            /// Press 'CMD' and click on image on 2 points to draw cropping region if user has not been dragging
+            /// Press 'CMD' and click on image on 2 points to draw cropping region
+            /// if user has not been dragging
             if event.modifierFlags.intersection(.deviceIndependentFlagsMask) == [.command] && !croppingView.isDragging {
                 if croppingView.startingPointFor2PointRectangle == nil {
                     croppingView.startingPointFor2PointRectangle = event.locationInWindow
@@ -130,10 +130,19 @@ class RapidCropViewController: NSViewController {
                     let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
                     
                     let mainImageStartingPoint = croppingView.startingPointFor2PointRectangle!
-                    let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
+                    let mainImageStartingPointFlippedY = mainImageViewHeight - mainImageStartingPoint.y // Need to flip NSView coordinate system to CGImage coordinate system
                     let mainImageEndingPoint =  event.locationInWindow
+                    let mainImageWidth = mainImageEndingPoint.x - mainImageStartingPoint.x
+                    let mainImageHeight = mainImageStartingPoint.y - mainImageEndingPoint.y
                     
-                    croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+                    croppedImages.append(
+                        croppingView.cropImage(mainImageView.image!,
+                                               cropRect: CGRect(x: mainImageStartingPoint.x,
+                                                                y: mainImageStartingPointFlippedY,
+                                                                width: mainImageWidth,
+                                                                height: mainImageHeight),
+                                               displayWidth: mainImageView.bounds.width,
+                                               displayHeight: mainImageView.bounds.height)!)
                     
                     croppingView.startingPointFor2PointRectangle = nil
                     croppingView.isCreatingTwoPointRectangle = false
@@ -149,10 +158,19 @@ class RapidCropViewController: NSViewController {
                 let mainImageViewHeight: CGFloat = mainImageView.bounds.size.height
                 
                 let mainImageStartingPoint = croppingView.startingPoint!
-                let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // NSImage y-coordinate ≠ view coordinates
+                let mainImageStartingPointModifiedY = mainImageViewHeight - mainImageStartingPoint.y // Need to flip NSView coordinate system to CGImage coordinate system
                 let mainImageEndingPoint =  croppingView.endingPoint!
+                let mainImageWidth = mainImageEndingPoint.x - mainImageStartingPoint.x
+                let mainImageHeight = mainImageStartingPoint.y - mainImageEndingPoint.y
                 
-                croppedImages.append(croppingView.cropImage(mainImageView.image!, cropRect: CGRect(x: mainImageStartingPoint.x, y: mainImageStartingPointModifiedY, width: mainImageEndingPoint.x - mainImageStartingPoint.x, height: mainImageStartingPoint.y - mainImageEndingPoint.y), displayWidth: mainImageView.bounds.width, displayHeight: mainImageView.bounds.height)!)
+                croppedImages.append(
+                    croppingView.cropImage(mainImageView.image!,
+                                           cropRect: CGRect(x: mainImageStartingPoint.x,
+                                                            y: mainImageStartingPointModifiedY,
+                                                            width: mainImageWidth,
+                                                            height: mainImageHeight),
+                                           displayWidth: mainImageView.bounds.width,
+                                           displayHeight: mainImageView.bounds.height)!)
                 croppingView.isDragging = false
             }
             else {
